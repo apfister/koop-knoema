@@ -3,4 +3,3 @@
 node_modules
 
 config/development.json
-config/custom-environment-variables.json
