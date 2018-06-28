@@ -1,0 +1,26 @@
+{
+  "name": "koop-knoema",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "config": "^1.30.0",
+    "koop": "^3.0.0",
+    "moment": "^2.22.2",
+    "node-schedule": "^1.3.0",
+    "request": "^2.79.0",
+    "request-promise-native": "^1.0.5"
+  },
+  "devDependencies": {
+    "nock": "^9.0.2",
+    "standard": "^10.0.0",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.6.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
