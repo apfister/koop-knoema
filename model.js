@@ -6,7 +6,7 @@ const rp = require('request-promise-native');
 const countryGeom = require('./data/country-geometry.json');
 
 function Model(koop) {
-  const apiUrl = `${config.baseUrl}/${config.apiVersion}`;
+  const apiUrl = `${config.baseUrl}`;
   config.apiUrl = apiUrl;
 
   // console.log('CONFIG ===>', config);
@@ -50,13 +50,44 @@ Model.prototype.getData = (req, callback) => {
     timeMembers = getTimeMembers(req.query.time);
   }
 
-  getPivotData(datasetId, indicator, timeMembers)
-    .then(response => {
-      const featureSet = translate(response.data);
-      featureSet.metadata = attachFeatureMetadata(response.filter[0].members[0], response.datasetName, featureSet.dateMin, featureSet.dateMax);
-      callback(null, featureSet); 
-    })
-    .catch(error => callback(error, null));
+  if (config.sdgDatasetId === datasetId) {
+    const inbound = indicator.split(':');
+    const goal = parseInt(inbound[0]);
+    const target = parseInt(inbound[1]);
+
+    getPivotSdgData(datasetId, goal, target, timeMembers)
+      .then(response => {
+        const featureSet = translate(response.data);
+
+        const targetDescription = response.filter.filter(item => item.dimensionId === 'target')[0].members[0];
+        const goalDescription = response.filter.filter(item => item.dimensionId === 'goal')[0].members[0];
+
+        let layerName = targetDescription.substr(0, targetDescription.indexOf('. Age'));
+        if (featureSet.features.length > 0) {
+          const units = featureSet.features[0].properties.units;
+          layerName = `${layerName} (${units})`;
+        }
+        const layerDescription = `${targetDescription}. ${goalDescription}`;
+
+        featureSet.metadata = attachFeatureMetadata(layerName, layerDescription, featureSet.dateMin, featureSet.dateMax);
+
+        callback(null, featureSet); 
+      })
+      .catch(error => {
+        console.log(error);
+        callback(error, null)
+      });
+  } else {
+
+    getPivotData(datasetId, indicator, timeMembers)
+      .then(response => {
+        const featureSet = translate(response.data);
+        featureSet.metadata = attachFeatureMetadata(response.filter[0].members[0], response.datasetName, featureSet.dateMin, featureSet.dateMax);
+        callback(null, featureSet); 
+      })
+      .catch(error => callback(error, null));
+
+  }
 }
 
 Model.prototype.getDatasetDetail = (req, callback) => {
@@ -67,6 +98,36 @@ Model.prototype.getDatasetDetail = (req, callback) => {
     .catch(error => {
       callback(error, null);
     });  
+}
+
+function getPivotSdgData(datasetId, goal, target, timeMembers) {
+  const uri = `${config.sdgApiUrl}/data/pivot`;
+
+  const payload = {"Dataset":"dlwvlne","Header":[{"FilterText":null,"DimensionId":"Time","Members":[],"DatasetId":"AFRSDG2016","UiMode":"allData"}],"Stub":[{"FilterText":null,"DimensionId":"country","Members":[1000100,1000000,1000010,1000020,1000030,1000040,1000050,1000060,1000070,1000080,1000090,1000110,1000120,1000130,1000140,1000150,1000160,1000170,1000180,1000190,1000200,1000210,1000220,1000230,1000240,1000250,1000260,1000270,1000280,1000290,1000300,1000310,1000320,1000330,1000340,1000350,1000360,1000370,1000390,1000400,1000410,1000420,1000430,1000440,1000450,1000460,1000470,1000480,1000490,1000500,1000510,1000520,1000530],"DatasetId":"dlwvlne"}],"Filter":[{"FilterText":null,"DimensionId":"country-target","Members":[1000000],"DatasetId":"dlwvlne"},{"FilterText":null,"DimensionId":"goal","Members":[1000070],"DatasetId":"dlwvlne"},{"FilterText":null,"DimensionId":"target","Members":[1003750],"DatasetId":"dlwvlne"}],"Frequencies":["A"],"Sort":{"Discriminator":{"Time":"*","country-target":1000000,"goal":1000070,"target":1003750},"BaseMember":{"Key":null,"Value":null},"Order":"desc","Top":1000000,"ShowOthers":false}};
+
+  payload.Dataset = config.sdgDatasetId;
+  payload.Stub[0].DatasetId = config.sdgDatasetId;
+  
+  payload.Filter[0].DatasetId = config.sdgDatasetId;
+  payload.Filter[1].Members = [ parseInt(goal) ];
+  payload.Filter[2].Members = [ parseInt(target) ];
+
+  payload.Sort.Discriminator.goal = parseInt(goal);
+  payload.Sort.Discriminator.target = parseInt(target);
+
+  if (timeMembers.length > 0) {
+    payload.Header[0].Members = timeMembers.map(t => t.toString());
+    payload.Header[0].UiMode = 'individualMembers';
+  }
+
+  return rp({
+    uri,
+    method: 'POST',
+    json: payload,
+    headers: {
+      'Authorization': config.authHash
+    }
+  });
 }
 
 function getPivotData(datasetId, indicator, timeMembers) {
@@ -138,8 +199,8 @@ function translate(input) {
 function collectFeatures (inputs) {
   features = [];
 
-  let min = moment();
-  let max = moment();
+  let min = moment.utc();
+  let max = moment.utc();
 
   inputs.forEach(timePeriod => {
     const featureData = timePeriod.columnData;
@@ -153,8 +214,8 @@ function collectFeatures (inputs) {
           country: itemData.country,
           indicator: itemData.indicator,
           regionId: itemData.RegionId,
-          year: moment(itemData.Time).format('YYYY'),
-          date: moment(itemData.Time).valueOf()
+          year: moment.utc(itemData.Time).format('YYYY'),
+          date: moment.utc(itemData.Time).valueOf()
         },
         geometry: {
           type: 'Point',
@@ -163,13 +224,18 @@ function collectFeatures (inputs) {
       }
       features.push(feature);
 
-      min = moment.min(min, moment(itemData.Time));
-      max = moment.max(max, moment(itemData.Time));
+      min = moment.min(min, moment.utc(itemData.Time));
+      max = moment.max(max, moment.utc(itemData.Time));
     });
   });
 
   // console.log('time extent', min.format('YYYY'), max.format('YYYY'))
-  return {features: features, dateMin:min.valueOf(), dateMax:max.valueOf()};
+  const obj = {
+    features: features, 
+    dateMin:min.valueOf(), 
+    dateMax:max.valueOf()
+  };
+  return obj;
 }
 
 function getTimeMembers(time) {
@@ -182,7 +248,7 @@ function getTimeMembers(time) {
     for (var i=start; i <= end;i++) {
       timeMembers.push(i);
     }
-    // console.log('timeMembers', timeMembers);
+    console.log('timeMembers', timeMembers);
   }
   return timeMembers;
 }

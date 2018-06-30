@@ -1,4 +1,5 @@
 {
-    "baseUrl" : "http://dataportal.opendataforafrica.org/api",
-    "apiVersion": "1.0"
+    "baseUrl" : "http://dataportal.opendataforafrica.org/api/1.0",
+    "sdgApiUrl" : "http://sdg.opendataforafrica.org/api/1.0",
+    "sdgDatasetId": "dlwvlne"
 }
