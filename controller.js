@@ -44,9 +44,13 @@ Controller.prototype.getSdgUrls = function (req, res) {
     if (err) {
       res.status(500 || err.code).json({ error: err });
     } else {
-      res.json(resource);
+      if (req.query && req.query.f && req.query.f === 'html') {
+        res.render('url.pug', {resource: resource});
+      } else {
+        res.json(resource);
+      }      
     }
-  });
+  });  
 };
 
 module.exports = Controller;

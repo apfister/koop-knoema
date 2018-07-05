@@ -1,5 +1,6 @@
 {
     "baseUrl" : "http://dataportal.opendataforafrica.org/api/1.0",
     "sdgApiUrl" : "http://sdg.opendataforafrica.org/api/1.0",
+    "knoemaApiUrl" : "http://sdg.opendataforafrica.org/api/1.0",
     "sdgDatasetId": "dlwvlne"
 }

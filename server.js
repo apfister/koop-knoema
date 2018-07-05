@@ -2,6 +2,10 @@
 process.on('SIGINT', () => process.exit(0));
 process.on('SIGTERM', () => process.exit(0));
 
+const express = require('express');
+const app = express();
+app.set('view engine', 'pug');
+
 const Koop = require('koop');
 const koop = new Koop();
 
@@ -10,7 +14,9 @@ koop.register(provider);
 
 const port = process.env.PORT || 3000;
 
-koop.server.listen(port, (err) => {
+app.use(koop.server);
+
+app.listen(port, (err) => {
   if (err) {
     console.log(err);
   }

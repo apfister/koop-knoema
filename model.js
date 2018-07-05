@@ -126,57 +126,67 @@ function getGoalTargetMeta(type) {
   return rp({
     uri,
     method: 'GET',
-    json: true
+    json: true,
+    headers: {
+      'Authorization': config.authHash
+    }
   });
 }
 
 Model.prototype.getSdgGoalsTargets = (req, callback) => {
   const type = req.params.type.substr(0,req.params.type.length-1);
+
   getGoalTargetMeta(type)
-  .then(response => {
-    callback(null, response);
-  })
-  .catch(error => {
-    callback(error, null);
-  });
+    .then(response => {
+      callback(null, response);
+    })
+    .catch(error => {
+      callback(error, null);
+    });
 };
 
 Model.prototype.getSdgUrls = (req, callback) => {
   const base = `${req.protocol}://${req.get('host')}/knoema/${config.sdgDatasetId}`;
 
   getGoalTargetMeta('goal')
-  .then(goals => {
-    if (req.params.filter) {
-      goals.items = goals.items.filter(goal => goal.fields.id.split('.')[1] === req.params.filter);
-    }
-    getGoalTargetMeta('target')
-    .then(targets => {
-      let urls = [];
-      goals.items.forEach(goal => {
-        const goalKey = goal.key;
-        const goalId = goal.fields.id.split('.')[1];
-        const foundTargets = targets.items.filter(target => target.fields.goal === goalId);
+    .then(goals => {
+      if (req.params.filter) {
+        goals.items = goals.items.filter(goal => goal.fields.id.split('.')[1] === req.params.filter);
+      }
 
-        foundTargets.forEach(ft => {
-          
-          const url = `${base}/${goalKey}:${ft.key}/FeatureServer/0`;
-          urls.push({
-            goalName: goal.name,
-            targetName: ft.name,
-            targetId: ft.fields.target,
-            indicatorId: ft.fields.indicator,
-            seriesCode: ft.fields['series-code'],
-            unit: ft.fields.unit,
-            source: ft.fields.source,
-            featureServerUrl: url
-          });
+      getGoalTargetMeta('target')
+        .then(targets => {
+          let urls = [];
+          goals.items.forEach(goal => {
+            const goalKey = goal.key;
+            const goalId = goal.fields.id.split('.')[1];
+            const foundTargets = targets.items.filter(target => target.fields.goal === goalId);
+
+            foundTargets.forEach(ft => {          
+              const url = `${base}/${goalKey}:${ft.key}/FeatureServer/0`;
+              urls.push({
+                goal: goalId,
+                goalName: goal.name,
+                targetName: ft.name,
+                targetId: ft.fields.target,
+                indicatorId: ft.fields.indicator,
+                seriesCode: ft.fields['series-code'],
+                unit: ft.fields.unit,
+                source: ft.fields.source,
+                featureServerUrl: url
+              });
+            });
+          });    
+
+          callback(null, urls);
+        })
+        .catch(error => {
+          callback(error, null)
         });
-
-      });
-
-      callback(null, urls);
+    })
+    .catch(error => {
+      callback(error, null);
     });
-  });
 }
 
 function getPivotSdgData(datasetId, goal, target, timeMembers) {

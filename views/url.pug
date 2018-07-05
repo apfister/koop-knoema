@@ -1,0 +1,26 @@
+table
+    thead
+        tr
+            th Feature Service Link
+            th Goal
+            th Target
+            th Target Name
+            th Indicator
+            th Series
+    tbody
+        each item in resource
+            tr
+                td 
+                    a(href=`${item.featureServerUrl}` target='_blank') Link
+                td
+                    p #{item.goal}
+                td
+                    p #{item.targetId}
+                td
+                    p #{item.targetName}
+                td
+                    p #{item.indicatorId}
+                td
+                    p #{item.seriesCode}
+                
+            
