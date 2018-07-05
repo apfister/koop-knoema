@@ -35,6 +35,27 @@ function generateHash(dte) {
   config.authHash = `Knoema ${client_id}:${hash}:1.2`;
 }
 
+Model.prototype.getApiDetail = (req, callback) => {
+  const sdgBase = `${req.protocol}://${req.get('host')}/knoema/sdgs`;
+
+  const detail = {
+    goals: {
+      description: 'Use this URL to get a listing of all available detail for SDG Goals',
+      url: `${req.protocol}://${req.get('host')}/knoema/sdgs/goals`
+    },
+    targets: {
+      description: 'Use this URL to get a listing of all available detail for SDG Targets',
+      url: `${req.protocol}://${req.get('host')}/knoema/sdgs/targets`
+    },
+    featureServerUrls: {
+      description: 'Use this URL to get a listing of feature server URLs for all available indicator data. Adding an optional :goal will filter results to that goal',
+      url: `${req.protocol}://${req.get('host')}/knoema/sdgurls/:goal?`
+    }
+  };
+
+  callback(null, detail);
+}
+
 Model.prototype.getData = (req, callback) => {
   // console.log('req.params', req.params);
   
@@ -98,6 +119,64 @@ Model.prototype.getDatasetDetail = (req, callback) => {
     .catch(error => {
       callback(error, null);
     });  
+}
+
+function getGoalTargetMeta(type) {  
+  const uri = `${config.sdgApiUrl}/meta/dataset/dlwvlne/dimension/${type}`;
+  return rp({
+    uri,
+    method: 'GET',
+    json: true
+  });
+}
+
+Model.prototype.getSdgGoalsTargets = (req, callback) => {
+  const type = req.params.type.substr(0,req.params.type.length-1);
+  getGoalTargetMeta(type)
+  .then(response => {
+    callback(null, response);
+  })
+  .catch(error => {
+    callback(error, null);
+  });
+};
+
+Model.prototype.getSdgUrls = (req, callback) => {
+  const base = `${req.protocol}://${req.get('host')}/knoema/${config.sdgDatasetId}`;
+
+  getGoalTargetMeta('goal')
+  .then(goals => {
+    if (req.params.filter) {
+      goals.items = goals.items.filter(goal => goal.fields.id.split('.')[1] === req.params.filter);
+    }
+    getGoalTargetMeta('target')
+    .then(targets => {
+      let urls = [];
+      goals.items.forEach(goal => {
+        const goalKey = goal.key;
+        const goalId = goal.fields.id.split('.')[1];
+        const foundTargets = targets.items.filter(target => target.fields.goal === goalId);
+
+        foundTargets.forEach(ft => {
+          
+          const url = `${base}/${goalKey}:${ft.key}/FeatureServer/0`;
+          urls.push({
+            goalName: goal.name,
+            targetName: ft.name,
+            targetId: ft.fields.target,
+            indicatorId: ft.fields.indicator,
+            seriesCode: ft.fields['series-code'],
+            unit: ft.fields.unit,
+            source: ft.fields.source,
+            featureServerUrl: url
+          });
+        });
+
+      });
+
+      callback(null, urls);
+    });
+  });
 }
 
 function getPivotSdgData(datasetId, goal, target, timeMembers) {

@@ -5,7 +5,12 @@
 */
 module.exports = [
   {
-    path: '/knoema/datasets/:id?/',
+    path: '/knoema',
+    methods: [ 'get', 'post' ],
+    handler: 'getApiDetail'
+  },
+  {
+    path: '/knoema/datasets/:id?',
     methods: [ 'get', 'post' ],
     handler: 'getDatasetDetail'
   },
@@ -13,5 +18,15 @@ module.exports = [
     path: '/knoema/datasets/:id/dimension/:dimensionId',
     methods: [ 'get', 'post' ],
     handler: 'getDatasetDetail'
+  },
+  {
+    path: '/knoema/sdgs/:type',
+    methods: [ 'get', 'post' ],
+    handler: 'getSdgGoalsTargets'
+  },
+  {
+    path: '/knoema/sdgurls/:filter?',
+    methods: [ 'get', 'post' ],
+    handler: 'getSdgUrls'
   }
 ];
