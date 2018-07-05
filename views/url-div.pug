@@ -1,0 +1,31 @@
+doctype html
+html
+    head
+        link(rel="stylesheet", href="/css/url.css", type="text/css")
+
+    body
+        div(class='wrapper')
+            div(class='table')
+                div(class='row header blue')                
+                    div(class='cell') Feature Service Link
+                    div(class='cell') Goal
+                    div(class='cell') Target
+                    div(class='cell') Target Name
+                    div(class='cell') Indicator
+                    div(class='cell') Series
+                each item in resource
+                    div(class='table-row')
+                        div(class='cell' data-title='') 
+                            a(href=`${item.featureServerUrl}` target='_blank') Link
+                        div(class='cell' data-title='')
+                            p #{item.goal}
+                        div(class='cell' data-title='')
+                            p #{item.targetId}
+                        div(class='cell' data-title='')
+                            p #{item.targetName}
+                        div(class='cell' data-title='')
+                            p #{item.indicatorId}
+                        div(class='cell' data-title='')
+                            p #{item.seriesCode}
+                    
+            

@@ -1,26 +1,55 @@
-table
-    thead
-        tr
-            th Feature Service Link
-            th Goal
-            th Target
-            th Target Name
-            th Indicator
-            th Series
-    tbody
-        each item in resource
-            tr
-                td 
-                    a(href=`${item.featureServerUrl}` target='_blank') Link
-                td
-                    p #{item.goal}
-                td
-                    p #{item.targetId}
-                td
-                    p #{item.targetName}
-                td
-                    p #{item.indicatorId}
-                td
-                    p #{item.seriesCode}
-                
+//- https://codepen.io/alico/pen/bpLgOL
+doctype html
+html
+    head
+        link(rel="stylesheet", href="/css/url.css", type="text/css")
+
+
+    body
+        div(class='center-pager') go to goal:
+            a(href='/knoema/sdgurls?f=html' style='margin-right:5px;margin-left:10px;') all
+            a(href='/knoema/sdgurls/1?f=html' style='margin-right:5px;') 1
+            a(href='/knoema/sdgurls/2?f=html' style='margin-right:5px;') 2
+            a(href='/knoema/sdgurls/3?f=html' style='margin-right:5px;') 3
+            a(href='/knoema/sdgurls/4?f=html' style='margin-right:5px;') 4
+            a(href='/knoema/sdgurls/5?f=html' style='margin-right:5px;') 5
+            a(href='/knoema/sdgurls/6?f=html' style='margin-right:5px;') 6
+            a(href='/knoema/sdgurls/7?f=html' style='margin-right:5px;') 7
+            a(href='/knoema/sdgurls/8?f=html' style='margin-right:5px;') 8
+            a(href='/knoema/sdgurls/9?f=html' style='margin-right:5px;') 9
+            a(href='/knoema/sdgurls/10?f=html' style='margin-right:5px;') 10
+            a(href='/knoema/sdgurls/11?f=html' style='margin-right:5px;') 11
+            a(href='/knoema/sdgurls/12?f=html' style='margin-right:5px;') 12
+            a(href='/knoema/sdgurls/13?f=html' style='margin-right:5px;') 13
+            a(href='/knoema/sdgurls/14?f=html' style='margin-right:5px;') 14
+            a(href='/knoema/sdgurls/15?f=html' style='margin-right:5px;') 15
+            a(href='/knoema/sdgurls/16?f=html' style='margin-right:5px;') 16
+            a(href='/knoema/sdgurls/17?f=html' style='margin-right:5px;') 17
+           
+        br
+        table
+            thead
+                tr
+                    th Feature Service Link
+                    th Goal
+                    th Target
+                    th Target Name
+                    th Indicator
+                    th Series
+            tbody
+                each item in resource
+                    tr
+                        td 
+                            a(href=`${item.featureServerUrl}` target='_blank') Link
+                        td
+                            p #{item.goal}
+                        td
+                            p #{item.targetId}
+                        td
+                            p #{item.targetName}
+                        td
+                            p #{item.indicatorId}
+                        td
+                            p #{item.seriesCode}
+                    
             
