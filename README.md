@@ -33,7 +33,9 @@ Register datasets from a Knoema datasource as a Koop provider
 - follow the rest of the instructions for [deploying your app to Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs#push-local-changes)
 
 
-### Using the Koop Provider
+## Using the Koop Provider
+
+### For Knoema Datasets
 The URL structure to use Knoema datasets as a FeatureServer will be:
 
 `http://<yourServerName>/knoema/<knoemaDatasetId>/<knoemaDatasetIndicatorKey>/FeatureServer/0`
@@ -53,3 +55,20 @@ A final example would look like this:
 `https://<yourServerName>/knoema/bbkawjf/1000420/FeatureServer/0`
 
 You can now use that URL in a variety of ArcGIS Online applications
+
+### For SDG Datasets
+Let's face it, there's a lot of data here and the SDGs only add more! Here are some helper URLs for dealing specifically with the SDGs datasets hosted by Knoema.
+
+Get some metadata for each Goal or Target:
+
+`http://<yourServerName>/knoema/sdgs/goals`
+`http://<yourServerName>/knoema/sdgs/targets`
+
+That's great, but maybe you are just interested in dropping in FeatureServer links into an ArcGIS app. Use this URL to get a listing of available links. This is, by far, the easiest way to get a direct link to a Series dataset.
+
+For any of the `/sdgurls/` links, add a `?f=html` to see a nice html view of the data instead of the default JSON response.
+
+Return all links: `http://<yourServerName>/knoema/sdgurls`
+
+Return all links for a specific goal: `http://<yourServerName>/knoema/sdgurls/<goalNumber>`
+
