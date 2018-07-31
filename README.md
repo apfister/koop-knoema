@@ -62,13 +62,13 @@ Let's face it, there's a lot of data here and the SDGs only add more! Here are s
 Get some metadata for each Goal or Target:
 
 `http://<yourServerName>/knoema/sdgs/goals`
+
 `http://<yourServerName>/knoema/sdgs/targets`
 
 That's great, but maybe you are just interested in dropping in FeatureServer links into an ArcGIS app. Use this URL to get a listing of available links. This is, by far, the easiest way to get a direct link to a Series dataset.
-
-For any of the `/sdgurls/` links, add a `?f=html` to see a nice html view of the data instead of the default JSON response.
 
 Return all links: `http://<yourServerName>/knoema/sdgurls`
 
 Return all links for a specific goal: `http://<yourServerName>/knoema/sdgurls/<goalNumber>`
 
+For any of the `/sdgurls/` links, add a `?f=html` to see a nice html view of the data instead of the default JSON response.

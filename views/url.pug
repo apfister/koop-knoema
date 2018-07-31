@@ -1,55 +1,64 @@
-//- https://codepen.io/alico/pen/bpLgOL
+//- https://datatables.net/
 doctype html
 html
     head
-        link(rel="stylesheet", href="/css/url.css", type="text/css")
+        link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css", type="text/css")
+        link(rel="stylesheet", href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css", type="text/css")        
+        
+        script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
+        script(src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js' integrity='sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49' crossorigin='anonymous')
 
-
+        script(src='https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js')
+        script(src='https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js')
+        
     body
-        div(class='center-pager') go to goal:
-            a(href='/knoema/sdgurls?f=html' style='margin-right:5px;margin-left:10px;') all
-            a(href='/knoema/sdgurls/1?f=html' style='margin-right:5px;') 1
-            a(href='/knoema/sdgurls/2?f=html' style='margin-right:5px;') 2
-            a(href='/knoema/sdgurls/3?f=html' style='margin-right:5px;') 3
-            a(href='/knoema/sdgurls/4?f=html' style='margin-right:5px;') 4
-            a(href='/knoema/sdgurls/5?f=html' style='margin-right:5px;') 5
-            a(href='/knoema/sdgurls/6?f=html' style='margin-right:5px;') 6
-            a(href='/knoema/sdgurls/7?f=html' style='margin-right:5px;') 7
-            a(href='/knoema/sdgurls/8?f=html' style='margin-right:5px;') 8
-            a(href='/knoema/sdgurls/9?f=html' style='margin-right:5px;') 9
-            a(href='/knoema/sdgurls/10?f=html' style='margin-right:5px;') 10
-            a(href='/knoema/sdgurls/11?f=html' style='margin-right:5px;') 11
-            a(href='/knoema/sdgurls/12?f=html' style='margin-right:5px;') 12
-            a(href='/knoema/sdgurls/13?f=html' style='margin-right:5px;') 13
-            a(href='/knoema/sdgurls/14?f=html' style='margin-right:5px;') 14
-            a(href='/knoema/sdgurls/15?f=html' style='margin-right:5px;') 15
-            a(href='/knoema/sdgurls/16?f=html' style='margin-right:5px;') 16
-            a(href='/knoema/sdgurls/17?f=html' style='margin-right:5px;') 17
-           
-        br
-        table
-            thead
-                tr
-                    th Feature Service Link
-                    th Goal
-                    th Target
-                    th Target Name
-                    th Indicator
-                    th Series
-            tbody
-                each item in resource
-                    tr
-                        td 
-                            a(href=`${item.featureServerUrl}` target='_blank') Link
-                        td
-                            p #{item.goal}
-                        td
-                            p #{item.targetId}
-                        td
-                            p #{item.targetName}
-                        td
-                            p #{item.indicatorId}
-                        td
-                            p #{item.seriesCode}
-                    
+        div(style='padding:25px;')
+            div(style='text-center') go to goal:
+                a(href='/knoema/sdgurls?f=html' style='margin-right:5px;margin-left:10px;') all
+                a(href='/knoema/sdgurls/1?f=html' style='margin-right:5px;') 1
+                a(href='/knoema/sdgurls/2?f=html' style='margin-right:5px;') 2
+                a(href='/knoema/sdgurls/3?f=html' style='margin-right:5px;') 3
+                a(href='/knoema/sdgurls/4?f=html' style='margin-right:5px;') 4
+                a(href='/knoema/sdgurls/5?f=html' style='margin-right:5px;') 5
+                a(href='/knoema/sdgurls/6?f=html' style='margin-right:5px;') 6
+                a(href='/knoema/sdgurls/7?f=html' style='margin-right:5px;') 7
+                a(href='/knoema/sdgurls/8?f=html' style='margin-right:5px;') 8
+                a(href='/knoema/sdgurls/9?f=html' style='margin-right:5px;') 9
+                a(href='/knoema/sdgurls/10?f=html' style='margin-right:5px;') 10
+                a(href='/knoema/sdgurls/11?f=html' style='margin-right:5px;') 11
+                a(href='/knoema/sdgurls/12?f=html' style='margin-right:5px;') 12
+                a(href='/knoema/sdgurls/13?f=html' style='margin-right:5px;') 13
+                a(href='/knoema/sdgurls/14?f=html' style='margin-right:5px;') 14
+                a(href='/knoema/sdgurls/15?f=html' style='margin-right:5px;') 15
+                a(href='/knoema/sdgurls/16?f=html' style='margin-right:5px;') 16
+                a(href='/knoema/sdgurls/17?f=html' style='margin-right:5px;') 17
             
+            br        
+            table(id='tbl' class='table table-striped table-bordered' width='100%')
+
+script.                    
+    $(document).ready(function() {
+        var resource = !{JSON.stringify(resource)};
+
+        var data = resource.map(item => {
+            return [ 
+                `<a href='https://www.arcgis.com/home/webmap/viewer.html?url=${item.featureServerUrl}' target='_blank'>View</a>`,
+                item.goal,
+                item.targetId,
+                item.targetName,
+                item.indicatorId,
+                item.seriesCode
+            ]
+        });
+        $('#tbl').DataTable({
+            data: data,
+            columns: [
+                { title: 'Link' },
+                { title: 'Goal' },
+                { title: 'Target' },
+                { title: 'Target Name' },
+                { title: 'Indicator' },
+                { title: 'Series' }
+            ]
+        });
+    } );
