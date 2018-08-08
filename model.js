@@ -106,7 +106,24 @@ Model.prototype.getData = (req, callback) => {
         featureSet.metadata = attachFeatureMetadata(response.filter[0].members[0], response.datasetName, featureSet.dateMin, featureSet.dateMax);
         callback(null, featureSet); 
       })
-      .catch(error => callback(error, null));
+      .catch(error => {
+        const message = error.message;
+        if (message.indexOf('{') > -1) {
+          try {
+            const parsed = JSON.parse(message.substr(message.indexOf('{'), message.length-1));
+            error.message = {
+              message: error.message,
+              details: parsed
+            };
+            callback(error, null);
+          } catch (e) {
+            callback(error, null);
+          }
+        } else {
+          callback(error, null)
+        }
+        
+      });
 
   }
 }
